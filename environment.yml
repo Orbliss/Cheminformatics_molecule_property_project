@@ -1,0 +1,21 @@
+name: cheminformatics_project
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - jupyterlab
+  - rdkit
+  - tensorflow
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pip
+  - pip:
+      - requests
+      - tqdm
