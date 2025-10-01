@@ -1,21 +1,84 @@
 import os
 import requests
+import tarfile
+import gzip
+import shutil
+from tqdm import tqdm
 
 DATA_DIR = "../data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 datasets = {
-    "PDBbind": "https://www.pdbbind-plus.org.cn/download.php",
-    "SIDER": "https://sideeffects.embl.de/download/"
+    "pdbbind_v2015.tar.gz": "http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/pdbbind_v2015.tar.gz",
+    "sider.csv.gz": "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/sider.csv.gz"
 }
 
-for name, url in datasets.items():
-    filepath = os.path.join(DATA_DIR, f"{name}.html")
-    if not os.path.exists(filepath):
-        print(f"Téléchargement de {name}...")
-        r = requests.get(url, verify=False)  # <- ignore SSL
-        with open(filepath, "wb") as f:
-            f.write(r.content)
-        print(f"{name} téléchargé et enregistré sous {filepath}")
-    else:
-        print(f"{name} est déjà présent.")
+def download_datasets():
+    for name, url in datasets.items():
+        filepath = os.path.join(DATA_DIR, name)
+        if not os.path.exists(filepath):
+            print(f"Téléchargement de {name}...")
+            
+            # Stream download with progress bar
+            response = requests.get(url, stream=True, verify=False)
+            total_size = int(response.headers.get('content-length', 0))
+            
+            with open(filepath, "wb") as f, tqdm(
+                desc=name,
+                total=total_size,
+                unit='B',
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as pbar:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        pbar.update(len(chunk))
+            
+            print(f"{name} téléchargé et enregistré sous {filepath}")
+        else:
+            print(f"{name} est déjà présent.")
+
+def extract_files():
+    """Extract downloaded compressed files"""
+    for name in datasets.keys():
+        filepath = os.path.join(DATA_DIR, name)
+        if os.path.exists(filepath):
+            if name.endswith('.tar.gz'):
+                extract_dir = os.path.join(DATA_DIR, name.replace('.tar.gz', ''))
+                if not os.path.exists(extract_dir):
+                    print(f"Extraction de {name}...")
+                    with tarfile.open(filepath, 'r:gz') as tar:
+                        members = tar.getmembers()
+                        with tqdm(total=len(members), desc=f"Extracting {name}") as pbar:
+                            for member in members:
+                                tar.extract(member, DATA_DIR)
+                                pbar.update(1)
+                    print(f"{name} extrait dans {extract_dir}")
+                else:
+                    print(f"{name} est déjà extrait.")
+            
+            elif name.endswith('.csv.gz'):
+                extract_path = os.path.join(DATA_DIR, name.replace('.gz', ''))
+                if not os.path.exists(extract_path):
+                    print(f"Extraction de {name}...")
+                    with gzip.open(filepath, 'rb') as f_in:
+                        with open(extract_path, 'wb') as f_out:
+                            # Get compressed file size for progress bar
+                            compressed_size = os.path.getsize(filepath)
+                            
+                            with tqdm(total=compressed_size, desc=f"Extracting {name}", unit='B', unit_scale=True) as pbar:
+                                while True:
+                                    chunk = f_in.read(8192)
+                                    if not chunk:
+                                        break
+                                    f_out.write(chunk)
+                                    # Update progress based on compressed bytes read
+                                    pbar.update(len(chunk))
+                    print(f"{name} extrait vers {extract_path}")
+                else:
+                    print(f"{name} est déjà extrait.")
+
+if __name__ == "__main__":
+    download_datasets()
+    extract_files()
