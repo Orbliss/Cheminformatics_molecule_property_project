@@ -2,7 +2,6 @@ import os
 import requests
 import tarfile
 import gzip
-import shutil
 from tqdm import tqdm
 
 DATA_DIR = "../data"
