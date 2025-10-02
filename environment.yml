@@ -20,3 +20,8 @@ dependencies:
   - pip:
       - requests
       - tqdm
+      - deepchem
+      - torch-geometric
+      - transformers
+      - lightning
+      - jax

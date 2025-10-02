@@ -1,16 +1,57 @@
 import os
+import shutil
+import pandas as pd
+from pathlib import Path
+import deepchem as dc
+from deepchem.utils import data_utils
+
+# =========================
+# Définir les dossiers
+# =========================
+data_dir = "data"
+sider_dir = os.path.join(data_dir, "sider")
+pdbbind_dir = os.path.join(data_dir, "pdbbind")
+
+os.makedirs(sider_dir, exist_ok=True)
+os.makedirs(pdbbind_dir, exist_ok=True)
+
+# =========================
+# 1️⃣ Télécharger SIDER et exporter CSV
+# =========================
+print("Téléchargement du dataset SIDER...")
+sider_tasks, (train, valid, test), transformer = dc.molnet.load_sider(reload=True)
+
+def dataset_to_df(dataset):
+    X = [d[0] for d in dataset.X]  # SMILES
+    y = dataset.y
+    df = pd.DataFrame(y, columns=sider_tasks)
+    df['smiles'] = X
+    return df
+
+train_df = dataset_to_df(train)
+train_df.to_csv(os.path.join(sider_dir, "train.csv"), index=False)
+
+valid_df = dataset_to_df(valid)
+valid_df.to_csv(os.path.join(sider_dir, "valid.csv"), index=False)
+
+test_df = dataset_to_df(test)
+test_df.to_csv(os.path.join(sider_dir, "test.csv"), index=False)
+
+print("SIDER CSVs sauvegardés dans :", sider_dir)
+
+
+import os
 import requests
 import tarfile
 import gzip
 import shutil
 from tqdm import tqdm
 
-DATA_DIR = "../data"
+DATA_DIR = "../data/pdbbind"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 datasets = {
     "pdbbind_v2015.tar.gz": "http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/pdbbind_v2015.tar.gz",
-    "sider.csv.gz": "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/sider.csv.gz"
 }
 
 def download_datasets():
