@@ -20,3 +20,4 @@ dependencies:
   - pip:
       - requests
       - tqdm
+      - py3Dmol
