@@ -4,8 +4,14 @@ import tarfile
 import gzip
 from tqdm import tqdm
 
-DATA_DIR = "../data"
+# Use absolute path based on script location to ensure consistent data directory
+# This will always point to the project's data folder regardless of where the script is called from
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
+
+print(f"Data directory: {DATA_DIR}")
 
 datasets = {
     "pdbbind_v2015.tar.gz": "http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/pdbbind_v2015.tar.gz",
@@ -78,6 +84,13 @@ def extract_files():
                 else:
                     print(f"{name} est déjà extrait.")
 
+def delete_files():
+    for name in datasets.keys():
+        filepath = os.path.join(DATA_DIR, name)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
 if __name__ == "__main__":
     download_datasets()
     extract_files()
+    delete_files()
