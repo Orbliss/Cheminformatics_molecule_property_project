@@ -16,6 +16,7 @@ dependencies:
   - pytorch
   - torchvision
   - torchaudio
+  - xgboost
   - pip
   - pip:
       - requests
