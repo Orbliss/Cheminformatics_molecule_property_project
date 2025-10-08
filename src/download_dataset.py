@@ -4,13 +4,19 @@ import pandas as pd
 from pathlib import Path
 import deepchem as dc
 from deepchem.utils import data_utils
+import requests
+import tarfile
+import gzip
+from tqdm import tqdm
 
 # =========================
 # Définir les dossiers
 # =========================
-data_dir = "data"
-sider_dir = os.path.join(data_dir, "sider")
-pdbbind_dir = os.path.join(data_dir, "pdbbind")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+sider_dir = os.path.join(DATA_DIR, "sider")
+pdbbind_dir = os.path.join(DATA_DIR, "pdbbind")
 
 os.makedirs(sider_dir, exist_ok=True)
 os.makedirs(pdbbind_dir, exist_ok=True)
@@ -18,6 +24,8 @@ os.makedirs(pdbbind_dir, exist_ok=True)
 # =========================
 # 1️⃣ Télécharger SIDER et exporter CSV
 # =========================
+
+
 print("Téléchargement du dataset SIDER...")
 sider_tasks, (train, valid, test), transformer = dc.molnet.load_sider(reload=True)
 
@@ -40,15 +48,7 @@ test_df.to_csv(os.path.join(sider_dir, "test.csv"), index=False)
 print("SIDER CSVs sauvegardés dans :", sider_dir)
 
 
-import os
-import requests
-import tarfile
-import gzip
-import shutil
-from tqdm import tqdm
 
-DATA_DIR = "../data/pdbbind"
-os.makedirs(DATA_DIR, exist_ok=True)
 
 datasets = {
     "pdbbind_v2015.tar.gz": "http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/pdbbind_v2015.tar.gz",
@@ -56,7 +56,7 @@ datasets = {
 
 def download_datasets():
     for name, url in datasets.items():
-        filepath = os.path.join(DATA_DIR, name)
+        filepath = os.path.join(pdbbind_dir, name)
         if not os.path.exists(filepath):
             print(f"Téléchargement de {name}...")
             
@@ -83,24 +83,24 @@ def download_datasets():
 def extract_files():
     """Extract downloaded compressed files"""
     for name in datasets.keys():
-        filepath = os.path.join(DATA_DIR, name)
+        filepath = os.path.join(pdbbind_dir, name)
         if os.path.exists(filepath):
             if name.endswith('.tar.gz'):
-                extract_dir = os.path.join(DATA_DIR, name.replace('.tar.gz', ''))
+                extract_dir = os.path.join(pdbbind_dir, name.replace('.tar.gz', ''))
                 if not os.path.exists(extract_dir):
                     print(f"Extraction de {name}...")
                     with tarfile.open(filepath, 'r:gz') as tar:
                         members = tar.getmembers()
                         with tqdm(total=len(members), desc=f"Extracting {name}") as pbar:
                             for member in members:
-                                tar.extract(member, DATA_DIR)
+                                tar.extract(member, pdbbind_dir)
                                 pbar.update(1)
                     print(f"{name} extrait dans {extract_dir}")
                 else:
                     print(f"{name} est déjà extrait.")
             
             elif name.endswith('.csv.gz'):
-                extract_path = os.path.join(DATA_DIR, name.replace('.gz', ''))
+                extract_path = os.path.join(pdbbind_dir, name.replace('.gz', ''))
                 if not os.path.exists(extract_path):
                     print(f"Extraction de {name}...")
                     with gzip.open(filepath, 'rb') as f_in:
