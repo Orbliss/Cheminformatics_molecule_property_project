@@ -17,8 +17,6 @@ dependencies:
   - torchvision
   - torchaudio
   - xgboost
-  - python-dotenv
-  - kaggle
   - pip
   - pip:
       - requests
