@@ -1,6 +1,7 @@
 import os
 import requests
 import tarfile
+import zipfile
 import gzip
 from tqdm import tqdm
 
@@ -18,7 +19,7 @@ datasets = {
     "sider.csv.gz": "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/sider.csv.gz"
 }
 
-def download_datasets():
+def download_datasets(datasets:dict=datasets):
     for name, url in datasets.items():
         filepath = os.path.join(DATA_DIR, name)
         if not os.path.exists(filepath):
@@ -44,7 +45,7 @@ def download_datasets():
         else:
             print(f"{name} est déjà présent.")
 
-def extract_files():
+def extract_files(datasets:dict=datasets):
     """Extract downloaded compressed files"""
     for name in datasets.keys():
         filepath = os.path.join(DATA_DIR, name)
@@ -83,6 +84,21 @@ def extract_files():
                     print(f"{name} extrait vers {extract_path}")
                 else:
                     print(f"{name} est déjà extrait.")
+
+            elif name.endswith('.zip'):
+                extract_dir = os.path.join(DATA_DIR, name.replace('.zip', ''))
+                if not os.path.exists(extract_dir):
+                    print(f"Extraction de {name}...")
+                    with zipfile.ZipFile(filepath, 'r') as z:
+                        members = z.namelist()
+                        with tqdm(total=len(members), desc=f"Extracting {name}") as pbar:
+                            for member in members:
+                                z.extract(member, DATA_DIR)
+                                pbar.update(1)
+                    print(f"{name} extrait dans {extract_dir}")
+                else:
+                    print(f"{name} est déjà extrait.")
+
 
 def delete_files():
     for name in datasets.keys():

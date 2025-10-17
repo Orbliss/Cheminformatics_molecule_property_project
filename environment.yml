@@ -17,9 +17,12 @@ dependencies:
   - torchvision
   - torchaudio
   - xgboost
+  - python-dotenv
+  - kaggle
   - pip
   - pip:
       - requests
       - tqdm
       - py3Dmol
       - biopandas
+      - molsets
