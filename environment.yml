@@ -17,6 +17,7 @@ dependencies:
   - torchvision
   - torchaudio
   - xgboost
+  - python-dotenv
   - pip
   - pip:
       - requests
@@ -24,3 +25,5 @@ dependencies:
       - py3Dmol
       - biopandas
       - molsets
+      - huggingface_hub
+      - transformers
