@@ -19,7 +19,7 @@ datasets = {
     "sider.csv.gz": "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/sider.csv.gz"
 }
 
-def download_datasets(datasets:dict=datasets):
+def download_datasets(datasets: dict[str,str]=datasets):
     for name, url in datasets.items():
         filepath = os.path.join(DATA_DIR, name)
         if not os.path.exists(filepath):
@@ -45,7 +45,7 @@ def download_datasets(datasets:dict=datasets):
         else:
             print(f"{name} est déjà présent.")
 
-def extract_files(datasets:dict=datasets):
+def extract_files(datasets: dict[str, str]=datasets):
     """Extract downloaded compressed files"""
     for name in datasets.keys():
         filepath = os.path.join(DATA_DIR, name)
