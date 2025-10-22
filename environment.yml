@@ -27,4 +27,7 @@ dependencies:
       - molsets
       - huggingface_hub
       - transformers
-      - fait-esm
+      - fair-esm
+      - jax
+      - jaxtyping
+      - beartype
