@@ -27,3 +27,4 @@ dependencies:
       - molsets
       - huggingface_hub
       - transformers
+      - fait-esm
