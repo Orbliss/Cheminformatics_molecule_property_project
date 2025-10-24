@@ -1,0 +1,5 @@
+*.csv
+*.zip
+*.tar.gz
+*.npz
+/v2015
