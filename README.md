@@ -12,14 +12,10 @@ Cheminformatics_molecule_property_projet/
 - `environment.yaml` — Python dependencies  
 - `data/` — Dataset storage (not tracked in git)  
   - `README.md` — Explanation for dataset usage and choices 
-- `notebooks/` — Jupyter notebooks for analysis  
-  - `01_data_exploration.ipynb`  
-  - `02_classification.ipynb`  
-  - `03_regression.ipynb`  
+- `classification/` — Jupyter notebooks for classification
+- `regression/` — Jupyter notebooks for regression  
 - `src/` — Python modules  
-  - `preprocessing.py`  
-  - `models.py`  
-  - `evaluation.py`
+  - `download_dataset.py` - Script for downloading datasets
 ---
 ## 🚀 How to Run
 
@@ -36,7 +32,7 @@ Cheminformatics_molecule_property_projet/
 
 4. **Run the notebooks**
    ```bash
-   jupyter notebook notebooks/01_data_exploration.ipynb
+   jupyter notebook
 
 ---
 # 📊 Project Tasks
